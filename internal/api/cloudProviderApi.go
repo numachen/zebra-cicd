@@ -20,7 +20,7 @@ import (
 // @Success 201 {object} model.CloudProvider
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/cloud-providers [post]
+// @Router /api/vendors [post]
 func CreateCloudProviderHandler(c *gin.Context, svc *service.CloudProviderService) {
 	var req model.CloudProvider
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,7 +46,7 @@ func CreateCloudProviderHandler(c *gin.Context, svc *service.CloudProviderServic
 // @Param size query int false "页数" default(10)
 // @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.CloudProvider}}
 // @Failure 500 {object} map[string]string
-// @Router /api/cloud-providers [get]
+// @Router /api/vendors [get]
 func ListCloudProvidersHandler(c *gin.Context, svc *service.CloudProviderService) {
 	// 解析查询参数
 	name := c.Query("name")
@@ -96,7 +96,7 @@ func ListCloudProvidersHandler(c *gin.Context, svc *service.CloudProviderService
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/cloud-providers/{id} [get]
+// @Router /api/vendors/{id} [get]
 func GetCloudProviderHandler(c *gin.Context, svc *service.CloudProviderService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -125,7 +125,7 @@ func GetCloudProviderHandler(c *gin.Context, svc *service.CloudProviderService) 
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/cloud-providers/{id} [put]
+// @Router /api/vendors/{id} [put]
 func UpdateCloudProviderHandler(c *gin.Context, svc *service.CloudProviderService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -193,7 +193,7 @@ func UpdateCloudProviderHandler(c *gin.Context, svc *service.CloudProviderServic
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/cloud-providers/{id} [delete]
+// @Router /api/vendors/{id} [delete]
 func DeleteCloudProviderHandler(c *gin.Context, svc *service.CloudProviderService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -211,7 +211,7 @@ func DeleteCloudProviderHandler(c *gin.Context, svc *service.CloudProviderServic
 
 // RegisterCloudProviderRoutes 注册云厂商相关路由
 func RegisterCloudProviderRoutes(r *gin.Engine, svc *service.CloudProviderService) {
-	g := r.Group("/api/cloud-providers")
+	g := r.Group("/api/vendors")
 	{
 		// 创建云厂商
 		g.POST("", func(c *gin.Context) {

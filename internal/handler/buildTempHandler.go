@@ -28,13 +28,40 @@ func (r *BuildTemplateRepository) GetByID(id uint) (*model.BuildTemplate, error)
 	return &template, nil
 }
 
-// List 获取模板列表
-func (r *BuildTemplateRepository) List() ([]model.BuildTemplate, error) {
-	var templates []model.BuildTemplate
-	if err := r.db.Preload("Repos").Order("id DESC").Find(&templates).Error; err != nil {
-		return nil, err
+// List 获取模板列表并返回总数，支持过滤和分页
+func (r *BuildTemplateRepository) List(name, language, creator, updater string, page, size int) ([]model.BuildTemplateResponse, int64, error) {
+	var templates []model.BuildTemplateResponse
+	var count int64
+
+	// 构建查询条件
+	query := r.db.Model(&model.BuildTemplate{})
+
+	if name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
 	}
-	return templates, nil
+	if language != "" {
+		query = query.Where("language LIKE ?", "%"+language+"%")
+	}
+	if creator != "" {
+		query = query.Where("creator LIKE ?", "%"+creator+"%")
+	}
+
+	if updater != "" {
+		query = query.Where("updater LIKE ?", "%"+updater+"%")
+	}
+
+	// 获取总数
+	if err := query.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * size
+	if err := query.Order("id DESC").Offset(offset).Limit(size).Find(&templates).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return templates, count, nil
 }
 
 // Update 更新模板
@@ -44,6 +71,12 @@ func (r *BuildTemplateRepository) Update(template *model.BuildTemplate) error {
 
 // Delete 删除模板
 func (r *BuildTemplateRepository) Delete(id uint) error {
+	// 先删除关联的历史记录
+	if err := r.db.Where("template_id = ?", id).Delete(&model.TemplateHistory{}).Error; err != nil {
+		return err
+	}
+
+	// 再删除模板记录
 	return r.db.Delete(&model.BuildTemplate{}, id).Error
 }
 

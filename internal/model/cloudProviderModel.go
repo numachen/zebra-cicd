@@ -14,7 +14,6 @@ type CloudProvider struct {
 	Endpoint    string            `gorm:"type:text;comment:API端点" json:"endpoint"`
 	Config      string            `gorm:"type:text;comment:配置信息(JSON格式)" json:"config"`
 	Status      string            `gorm:"size:50;default:'active';comment:状态(active/inactive)" json:"status"`
-	IsDeleted   bool              `gorm:"default:false;comment:是否删除" json:"-"` // 软删除
 	CreatedAt   timeutil.JSONTime `gorm:"comment:创建时间" json:"created_at"`
 	UpdatedAt   timeutil.JSONTime `gorm:"comment:更新时间" json:"updated_at"`
 }

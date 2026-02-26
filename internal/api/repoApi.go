@@ -41,9 +41,9 @@ func CreateRepoHandler(c *gin.Context, svc *service.RepoService) {
 // @Produce json
 // @Param c_name query string false "中文名称"
 // @Param e_name query string false "英文名称"
-// @Param department query string false "归属部门"
+// @Param repo_department query string false "归属部门"
 // @Param language query string false "编程语言"
-// @Param manager query string false "项目管理者"
+// @Param repo_manager query string false "项目管理者"
 // @Param page query int false "页码" default(1)
 // @Param size query int false "页数" default(10)
 // @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.Repo}}
@@ -53,9 +53,9 @@ func ListReposHandler(c *gin.Context, svc *service.RepoService) {
 	// 解析查询参数
 	cName := c.Query("c_name")
 	eName := c.Query("e_name")
-	department := c.Query("department")
+	department := c.Query("repo_department")
 	language := c.Query("language")
-	manager := c.Query("manager")
+	manager := c.Query("repo_manager")
 
 	// 解析分页参数
 	page := 1
@@ -111,26 +111,6 @@ func GetRepoByIDHandler(c *gin.Context, svc *service.RepoService) {
 		return
 	}
 	repo, err := svc.GetRepoByID(uint(id))
-	if err != nil {
-		types.Error(c, http.StatusNotFound, "repo not found")
-		return
-	}
-	types.Success(c, repo)
-}
-
-// GetRepoByENameHandler 根据英文名称获取仓库处理函数
-// @Summary 根据英文名称获取仓库
-// @Description 根据仓库英文名称获取仓库详情
-// @Tags repos
-// @Produce json
-// @Param ename path string true "仓库英文名称"
-// @Success 200 {object} model.Repo
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/repos/ename/{ename} [get]
-func GetRepoByENameHandler(c *gin.Context, svc *service.RepoService) {
-	eName := c.Param("ename")
-	repo, err := svc.GetRepoByEName(eName)
 	if err != nil {
 		types.Error(c, http.StatusNotFound, "repo not found")
 		return
@@ -300,11 +280,6 @@ func RegisterRepoRoutes(r *gin.Engine, svc *service.RepoService, templateSvc *se
 		// 根据ID获取仓库
 		g.GET("/:id", func(c *gin.Context) {
 			GetRepoByIDHandler(c, svc)
-		})
-
-		// 根据英文名称获取仓库
-		g.GET("/ename/:ename", func(c *gin.Context) {
-			GetRepoByENameHandler(c, svc)
 		})
 
 		// 更新仓库

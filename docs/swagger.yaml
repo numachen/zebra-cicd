@@ -262,7 +262,7 @@ definitions:
     properties:
       c_name:
         type: string
-      created_at;:
+      created_at:
         type: string
       deployment_templates:
         description: 添加与部署模板的多对多关联关系
@@ -296,7 +296,7 @@ definitions:
         items:
           $ref: '#/definitions/model.BuildTemplate'
         type: array
-      updated_at;:
+      updated_at:
         type: string
     type: object
   model.Server:
@@ -341,7 +341,7 @@ definitions:
       template:
         allOf:
         - $ref: '#/definitions/model.BuildTemplate'
-        description: 关联模板
+        description: 指定关联字段
       template_id:
         type: integer
     type: object
@@ -394,569 +394,6 @@ info:
   title: Zebra-CICD API
   version: 0.1.0
 paths:
-  /api/cloud-providers:
-    get:
-      description: 获取所有云厂商的列表，支持按名称、提供商、状态等条件查询
-      parameters:
-      - description: 云厂商名称
-        in: query
-        name: name
-        type: string
-      - description: 提供商标识
-        in: query
-        name: provider
-        type: string
-      - description: 状态
-        in: query
-        name: status
-        type: string
-      - default: 1
-        description: 页码
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: 页数
-        in: query
-        name: size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/types.Response'
-            - properties:
-                data:
-                  allOf:
-                  - $ref: '#/definitions/types.PageResponse'
-                  - properties:
-                      records:
-                        items:
-                          $ref: '#/definitions/model.CloudProvider'
-                        type: array
-                    type: object
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取云厂商列表
-      tags:
-      - cloud-providers
-    post:
-      consumes:
-      - application/json
-      description: 创建一个新的云厂商
-      parameters:
-      - description: 云厂商信息
-        in: body
-        name: provider
-        required: true
-        schema:
-          $ref: '#/definitions/model.CloudProvider'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/model.CloudProvider'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 创建云厂商
-      tags:
-      - cloud-providers
-  /api/cloud-providers/{id}:
-    delete:
-      description: 根据云厂商ID删除云厂商（软删除）
-      parameters:
-      - description: 云厂商ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 删除云厂商
-      tags:
-      - cloud-providers
-    get:
-      description: 根据云厂商ID获取云厂商详情
-      parameters:
-      - description: 云厂商ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.CloudProvider'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 根据ID获取云厂商
-      tags:
-      - cloud-providers
-    put:
-      consumes:
-      - application/json
-      description: 根据云厂商ID更新云厂商信息
-      parameters:
-      - description: 云厂商ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 云厂商信息
-        in: body
-        name: provider
-        required: true
-        schema:
-          $ref: '#/definitions/model.CloudProvider'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.CloudProvider'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 更新云厂商
-      tags:
-      - cloud-providers
-  /api/deployment-templates:
-    get:
-      description: 获取所有部署模板的列表，支持按名称、类型、状态等条件查询
-      parameters:
-      - description: 部署模板名称
-        in: query
-        name: name
-        type: string
-      - description: 模板类型
-        in: query
-        name: type
-        type: string
-      - description: 状态
-        in: query
-        name: status
-        type: string
-      - description: 创建人
-        in: query
-        name: creator
-        type: string
-      - default: 1
-        description: 页码
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: 页数
-        in: query
-        name: size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/types.Response'
-            - properties:
-                data:
-                  allOf:
-                  - $ref: '#/definitions/types.PageResponse'
-                  - properties:
-                      records:
-                        items:
-                          $ref: '#/definitions/model.DeploymentTemplate'
-                        type: array
-                    type: object
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取部署模板列表
-      tags:
-      - deployment-templates
-    post:
-      consumes:
-      - application/json
-      description: 创建一个新的部署模板
-      parameters:
-      - description: 部署模板信息
-        in: body
-        name: template
-        required: true
-        schema:
-          $ref: '#/definitions/model.DeploymentTemplate'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/model.DeploymentTemplate'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 创建部署模板
-      tags:
-      - deployment-templates
-  /api/deployment-templates/{id}:
-    delete:
-      description: 根据部署模板ID删除部署模板（软删除）
-      parameters:
-      - description: 部署模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 删除部署模板
-      tags:
-      - deployment-templates
-    get:
-      description: 根据部署模板ID获取部署模板详情
-      parameters:
-      - description: 部署模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.DeploymentTemplate'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 根据ID获取部署模板
-      tags:
-      - deployment-templates
-    put:
-      consumes:
-      - application/json
-      description: 根据部署模板ID更新部署模板信息
-      parameters:
-      - description: 部署模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 部署模板信息
-        in: body
-        name: template
-        required: true
-        schema:
-          $ref: '#/definitions/model.DeploymentTemplate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.DeploymentTemplate'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 更新部署模板
-      tags:
-      - deployment-templates
-  /api/deployment-templates/{id}/history:
-    get:
-      description: 根据部署模板ID获取模板的修改历史记录
-      parameters:
-      - description: 模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.DeploymentTemplateHistory'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取部署模板历史记录
-      tags:
-      - deployment-templates
-  /api/deployment-templates/{id}/repos:
-    get:
-      description: 根据部署模板ID获取所有关联的仓库列表
-      parameters:
-      - description: 模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.Repo'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取关联的仓库列表
-      tags:
-      - deployment-templates
-  /api/deployment-templates/{id}/repos/{repoId}:
-    delete:
-      description: 取消仓库与部署模板的关联
-      parameters:
-      - description: 模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 仓库ID
-        in: path
-        name: repoId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 取消仓库和部署模板关联
-      tags:
-      - deployment-template-repo
-    post:
-      description: 将仓库与部署模板进行关联
-      parameters:
-      - description: 模板ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 仓库ID
-        in: path
-        name: repoId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 关联仓库和部署模板
-      tags:
-      - deployment-template-repo
   /api/deploys:
     post:
       consumes:
@@ -1230,18 +667,47 @@ paths:
       summary: 更新环境
       tags:
       - environments
-  /api/image-repositories:
+  /api/image-registries:
     get:
-      description: 获取所有镜像仓库的列表
+      description: 获取所有镜像仓库的列表，支持按名称、地址过滤，支持分页
+      parameters:
+      - description: 仓库名称
+        in: query
+        name: name
+        type: string
+      - description: 仓库地址
+        in: query
+        name: url
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.ImageRepository'
-            type: array
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.ImageRepository'
+                        type: array
+                    type: object
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -1284,7 +750,7 @@ paths:
       summary: 创建镜像仓库
       tags:
       - image-repositories
-  /api/image-repositories/{id}:
+  /api/image-registries/{id}:
     delete:
       description: 根据镜像仓库ID删除镜像仓库（软删除）
       parameters:
@@ -1684,6 +1150,278 @@ paths:
       summary: 获取Pod列表
       tags:
       - k8s
+  /api/linux-machines:
+    get:
+      description: 获取所有服务器的列表，支持按名称、主机等条件查询
+      parameters:
+      - description: 服务器名称
+        in: query
+        name: name
+        type: string
+      - description: 服务器主机地址
+        in: query
+        name: host
+        type: string
+      - description: 是否激活
+        in: query
+        name: isActive
+        type: boolean
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 页数
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.Server'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取服务器列表
+      tags:
+      - servers
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的服务器连接信息
+      parameters:
+      - description: 服务器信息
+        in: body
+        name: server
+        required: true
+        schema:
+          $ref: '#/definitions/model.Server'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Server'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建服务器
+      tags:
+      - servers
+  /api/linux-machines/{id}:
+    delete:
+      description: 根据服务器ID删除服务器
+      parameters:
+      - description: 服务器ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 删除服务器
+      tags:
+      - servers
+    get:
+      description: 根据服务器ID获取服务器详情
+      parameters:
+      - description: 服务器ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Server'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 根据ID获取服务器
+      tags:
+      - servers
+    put:
+      consumes:
+      - application/json
+      description: 根据服务器ID更新服务器信息
+      parameters:
+      - description: 服务器ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 服务器信息
+        in: body
+        name: server
+        required: true
+        schema:
+          $ref: '#/definitions/model.Server'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Server'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 更新服务器
+      tags:
+      - servers
+  /api/linux-machines/{id}/connect:
+    post:
+      description: 测试连接到服务器
+      parameters:
+      - description: 服务器ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 连接服务器
+      tags:
+      - servers
+  /api/linux-machines/{id}/containers:
+    get:
+      description: 获取服务器上的Docker容器列表
+      parameters:
+      - description: 服务器ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.DockerContainer'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取Docker容器列表
+      tags:
+      - servers
   /api/repos:
     get:
       description: 获取所有仓库的列表，支持按中文名称、英文名称、部门、编程语言、项目管理者等条件查询
@@ -1698,7 +1436,7 @@ paths:
         type: string
       - description: 归属部门
         in: query
-        name: department
+        name: repo_department
         type: string
       - description: 编程语言
         in: query
@@ -1706,7 +1444,7 @@ paths:
         type: string
       - description: 项目管理者
         in: query
-        name: manager
+        name: repo_manager
         type: string
       - default: 1
         description: 页码
@@ -1931,37 +1669,6 @@ paths:
       summary: 获取仓库关联的模板
       tags:
       - repos
-  /api/repos/ename/{ename}:
-    get:
-      description: 根据仓库英文名称获取仓库详情
-      parameters:
-      - description: 仓库英文名称
-        in: path
-        name: ename
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Repo'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 根据英文名称获取仓库
-      tags:
-      - repos
   /api/repos/gitlab-url/{repoID}:
     get:
       description: 根据repoID从GitLab获取仓库信息
@@ -1981,278 +1688,6 @@ paths:
       summary: 根据repoID从GitLab获取仓库信息
       tags:
       - repos
-  /api/servers:
-    get:
-      description: 获取所有服务器的列表，支持按名称、主机等条件查询
-      parameters:
-      - description: 服务器名称
-        in: query
-        name: name
-        type: string
-      - description: 服务器主机地址
-        in: query
-        name: host
-        type: string
-      - description: 是否激活
-        in: query
-        name: isActive
-        type: boolean
-      - default: 1
-        description: 页码
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: 页数
-        in: query
-        name: size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/types.Response'
-            - properties:
-                data:
-                  allOf:
-                  - $ref: '#/definitions/types.PageResponse'
-                  - properties:
-                      records:
-                        items:
-                          $ref: '#/definitions/model.Server'
-                        type: array
-                    type: object
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取服务器列表
-      tags:
-      - servers
-    post:
-      consumes:
-      - application/json
-      description: 创建一个新的服务器连接信息
-      parameters:
-      - description: 服务器信息
-        in: body
-        name: server
-        required: true
-        schema:
-          $ref: '#/definitions/model.Server'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/model.Server'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 创建服务器
-      tags:
-      - servers
-  /api/servers/{id}:
-    delete:
-      description: 根据服务器ID删除服务器
-      parameters:
-      - description: 服务器ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 删除服务器
-      tags:
-      - servers
-    get:
-      description: 根据服务器ID获取服务器详情
-      parameters:
-      - description: 服务器ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Server'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 根据ID获取服务器
-      tags:
-      - servers
-    put:
-      consumes:
-      - application/json
-      description: 根据服务器ID更新服务器信息
-      parameters:
-      - description: 服务器ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 服务器信息
-        in: body
-        name: server
-        required: true
-        schema:
-          $ref: '#/definitions/model.Server'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Server'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 更新服务器
-      tags:
-      - servers
-  /api/servers/{id}/connect:
-    post:
-      description: 测试连接到服务器
-      parameters:
-      - description: 服务器ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 连接服务器
-      tags:
-      - servers
-  /api/servers/{id}/containers:
-    get:
-      description: 获取服务器上的Docker容器列表
-      parameters:
-      - description: 服务器ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.DockerContainer'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: 获取Docker容器列表
-      tags:
-      - servers
   /api/servers/{id}/containers/{containerID}/attach:
     get:
       description: 连接到指定容器（类似docker attach）
@@ -2333,18 +1768,55 @@ paths:
       summary: 在容器中执行命令
       tags:
       - containers
-  /api/templates:
+  /api/templates/build:
     get:
-      description: 获取所有构建模板的列表
+      description: 获取所有构建模板的列表，支持按名称、语言、创建者过滤，支持分页
+      parameters:
+      - description: 模板名称
+        in: query
+        name: name
+        type: string
+      - description: 编程语言
+        in: query
+        name: language
+        type: string
+      - description: 创建者
+        in: query
+        name: creator
+        type: string
+      - description: 修改人
+        in: query
+        name: updater
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.BuildTemplate'
-            type: array
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.BuildTemplate'
+                        type: array
+                    type: object
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -2387,7 +1859,7 @@ paths:
       summary: 创建构建模板
       tags:
       - buildTemplates
-  /api/templates/{id}:
+  /api/templates/build/{id}:
     delete:
       description: 根据模板ID删除构建模板
       parameters:
@@ -2500,14 +1972,24 @@ paths:
       summary: 更新构建模板
       tags:
       - buildTemplates
-  /api/templates/{id}/history:
+  /api/templates/build/{id}/history:
     get:
-      description: 根据模板ID获取模板的修改历史记录
+      description: 根据模板ID获取模板的修改历史记录，支持分页
       parameters:
       - description: 模板ID
         in: path
         name: id
         required: true
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: size
         type: integer
       produces:
       - application/json
@@ -2515,9 +1997,19 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.TemplateHistory'
-            type: array
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.TemplateHistory'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -2539,7 +2031,7 @@ paths:
       summary: 获取模板修改历史
       tags:
       - buildTemplates
-  /api/templates/{templateId}/repos/{repoId}:
+  /api/templates/build/{templateId}/repos/{repoId}:
     delete:
       description: 取消仓库与构建模板的关联
       parameters:
@@ -2614,6 +2106,569 @@ paths:
       summary: 关联仓库和模板
       tags:
       - template-repo
+  /api/templates/deployment:
+    get:
+      description: 获取所有部署模板的列表，支持按名称、类型、状态等条件查询
+      parameters:
+      - description: 部署模板名称
+        in: query
+        name: name
+        type: string
+      - description: 模板类型
+        in: query
+        name: type
+        type: string
+      - description: 状态
+        in: query
+        name: status
+        type: string
+      - description: 创建人
+        in: query
+        name: creator
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 页数
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.DeploymentTemplate'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取部署模板列表
+      tags:
+      - deployment-templates
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的部署模板
+      parameters:
+      - description: 部署模板信息
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/model.DeploymentTemplate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.DeploymentTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建部署模板
+      tags:
+      - deployment-templates
+  /api/templates/deployment/{id}:
+    delete:
+      description: 根据部署模板ID删除部署模板（软删除）
+      parameters:
+      - description: 部署模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 删除部署模板
+      tags:
+      - deployment-templates
+    get:
+      description: 根据部署模板ID获取部署模板详情
+      parameters:
+      - description: 部署模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DeploymentTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 根据ID获取部署模板
+      tags:
+      - deployment-templates
+    put:
+      consumes:
+      - application/json
+      description: 根据部署模板ID更新部署模板信息
+      parameters:
+      - description: 部署模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 部署模板信息
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/model.DeploymentTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DeploymentTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 更新部署模板
+      tags:
+      - deployment-templates
+  /api/templates/deployment/{id}/history:
+    get:
+      description: 根据部署模板ID获取模板的修改历史记录
+      parameters:
+      - description: 模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.DeploymentTemplateHistory'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取部署模板历史记录
+      tags:
+      - deployment-templates
+  /api/templates/deployment/{id}/repos:
+    get:
+      description: 根据部署模板ID获取所有关联的仓库列表
+      parameters:
+      - description: 模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Repo'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取关联的仓库列表
+      tags:
+      - deployment-templates
+  /api/templates/deployment/{id}/repos/{repoId}:
+    delete:
+      description: 取消仓库与部署模板的关联
+      parameters:
+      - description: 模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 仓库ID
+        in: path
+        name: repoId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 取消仓库和部署模板关联
+      tags:
+      - deployment-template-repo
+    post:
+      description: 将仓库与部署模板进行关联
+      parameters:
+      - description: 模板ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 仓库ID
+        in: path
+        name: repoId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 关联仓库和部署模板
+      tags:
+      - deployment-template-repo
+  /api/vendors:
+    get:
+      description: 获取所有云厂商的列表，支持按名称、提供商、状态等条件查询
+      parameters:
+      - description: 云厂商名称
+        in: query
+        name: name
+        type: string
+      - description: 提供商标识
+        in: query
+        name: provider
+        type: string
+      - description: 状态
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 页数
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/types.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/types.PageResponse'
+                  - properties:
+                      records:
+                        items:
+                          $ref: '#/definitions/model.CloudProvider'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取云厂商列表
+      tags:
+      - cloud-providers
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的云厂商
+      parameters:
+      - description: 云厂商信息
+        in: body
+        name: provider
+        required: true
+        schema:
+          $ref: '#/definitions/model.CloudProvider'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.CloudProvider'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建云厂商
+      tags:
+      - cloud-providers
+  /api/vendors/{id}:
+    delete:
+      description: 根据云厂商ID删除云厂商（软删除）
+      parameters:
+      - description: 云厂商ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 删除云厂商
+      tags:
+      - cloud-providers
+    get:
+      description: 根据云厂商ID获取云厂商详情
+      parameters:
+      - description: 云厂商ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CloudProvider'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 根据ID获取云厂商
+      tags:
+      - cloud-providers
+    put:
+      consumes:
+      - application/json
+      description: 根据云厂商ID更新云厂商信息
+      parameters:
+      - description: 云厂商ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 云厂商信息
+        in: body
+        name: provider
+        required: true
+        schema:
+          $ref: '#/definitions/model.CloudProvider'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CloudProvider'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 更新云厂商
+      tags:
+      - cloud-providers
   /health:
     get:
       description: 检查服务是否正常运行

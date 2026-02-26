@@ -36,7 +36,7 @@ func (r *EnvRepository) ListWithConditions(conditions types.EnvQueryConditions, 
 	offset := (page - 1) * size
 
 	// 构建查询条件
-	db := r.db.Model(&model.Environment{}).Where("is_deleted = ?", false)
+	db := r.db.Model(&model.Environment{})
 
 	if conditions.Name != "" {
 		db = db.Where("name LIKE ?", "%"+conditions.Name+"%")
@@ -68,9 +68,9 @@ func (r *EnvRepository) Update(env *model.Environment) error {
 	return r.db.Save(env).Error
 }
 
-// Delete 删除环境（软删除）
+// Delete 删除环境
 func (r *EnvRepository) Delete(id uint) error {
-	return r.db.Model(&model.Environment{}).Where("id = ?", id).Update("is_deleted", true).Error
+	return r.db.Model(&model.Environment{}).Where("id = ?", id).Delete(&model.Environment{}).Error
 }
 
 // HardDelete 硬删除环境

@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/numachen/zebra-cicd/internal/handler"
 	"github.com/numachen/zebra-cicd/internal/model"
+	"github.com/numachen/zebra-cicd/internal/types"
 )
 
 // ImageRepositoryService 提供通用的镜像仓库存储功能
@@ -25,9 +26,9 @@ func (s *ImageRepositoryService) GetRepositoryByID(id uint) (*model.ImageReposit
 	return s.repo.GetByID(id)
 }
 
-// ListRepositories 获取镜像仓库列表
-func (s *ImageRepositoryService) ListRepositories() ([]model.ImageRepository, error) {
-	return s.repo.List()
+// ListRepositories 根据条件分页获取镜像仓库列表
+func (s *ImageRepositoryService) ListRepositories(conditions types.ImageRepositoryQueryConditions) ([]model.ImageRepository, int64, error) {
+	return s.repo.ListWithConditions(conditions)
 }
 
 // UpdateRepository 更新镜像仓库

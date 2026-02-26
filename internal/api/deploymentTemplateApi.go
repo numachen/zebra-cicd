@@ -21,7 +21,7 @@ import (
 // @Success 201 {object} model.DeploymentTemplate
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates [post]
+// @Router /api/templates/deployment [post]
 func CreateDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	var req model.DeploymentTemplate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -48,11 +48,11 @@ func CreateDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemp
 // @Param size query int false "页数" default(10)
 // @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.DeploymentTemplate}}
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates [get]
+// @Router /api/templates/deployment [get]
 func ListDeploymentTemplatesHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	// 解析查询参数
 	name := c.Query("name")
-	templateType := c.Query("type")
+	templateType := c.Query("template_type")
 	status := c.Query("status")
 	creator := c.Query("creator")
 
@@ -100,7 +100,7 @@ func ListDeploymentTemplatesHandler(c *gin.Context, svc *service.DeploymentTempl
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id} [get]
+// @Router /api/templates/deployment/{id} [get]
 func GetDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -130,7 +130,7 @@ func GetDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplat
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id} [put]
+// @Router /api/templates/deployment/{id} [put]
 func UpdateDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -208,7 +208,7 @@ func UpdateDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemp
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id} [delete]
+// @Router /api/templates/deployment/{id} [delete]
 func DeleteDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -234,7 +234,7 @@ func DeleteDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemp
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id}/repos/{repoId} [post]
+// @Router /api/templates/deployment/{id}/repos/{repoId} [post]
 func AssociateRepoWithDeployTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	templateIDStr := c.Param("id")
 	repoIDStr := c.Param("repoId")
@@ -269,7 +269,7 @@ func AssociateRepoWithDeployTemplateHandler(c *gin.Context, svc *service.Deploym
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id}/repos/{repoId} [delete]
+// @Router /api/templates/deployment/{id}/repos/{repoId} [delete]
 func DisassociateRepoWithDeploymentTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	templateIDStr := c.Param("id")
 	repoIDStr := c.Param("repoId")
@@ -303,7 +303,7 @@ func DisassociateRepoWithDeploymentTemplateHandler(c *gin.Context, svc *service.
 // @Success 200 {array} model.Repo
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id}/repos [get]
+// @Router /api/templates/deployment/{id}/repos [get]
 func GetReposByTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
 	templateIDStr := c.Param("id")
 	templateID, err := strconv.Atoi(templateIDStr)
@@ -331,9 +331,9 @@ func GetReposByTemplateHandler(c *gin.Context, svc *service.DeploymentTemplateSe
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/deployment-templates/{id}/history [get]
+// @Router /api/templates/deployment/{id}/history [get]
 func GetDeploymentTemplateHistoryHandler(c *gin.Context, svc *service.DeploymentTemplateService) {
-	templateIDStr := c.Param("templateId")
+	templateIDStr := c.Param("id")
 	templateID, err := strconv.Atoi(templateIDStr)
 	if err != nil {
 		types.Error(c, http.StatusBadRequest, "invalid template id format")
@@ -350,7 +350,7 @@ func GetDeploymentTemplateHistoryHandler(c *gin.Context, svc *service.Deployment
 
 // RegisterDeploymentTemplateRoutes 注册部署模板相关路由
 func RegisterDeploymentTemplateRoutes(r *gin.Engine, svc *service.DeploymentTemplateService) {
-	g := r.Group("/api/deployment-templates")
+	g := r.Group("/api/templates/deployment")
 	{
 		// 创建部署模板
 		g.POST("", func(c *gin.Context) {

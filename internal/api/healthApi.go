@@ -35,7 +35,7 @@ func HealthCheckHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	types.Success(c, "Zebra CICD running.")
+	types.Success(c, "Zebra CICD is running.")
 }
 
 // RegisterHealthRoutes 注册环境相关路由

@@ -20,12 +20,20 @@ func (r *TemplateHistoryRepository) Create(history *model.TemplateHistory) error
 	return r.db.Create(history).Error
 }
 
-// GetHistoryByTemplateID 根据模板ID获取历史记录
-// GetHistoryByTemplateID 根据模板ID获取历史记录
-func (r *TemplateHistoryRepository) GetHistoryByTemplateID(templateID uint) ([]types.TemplateHistoryResponse, error) {
+// GetHistoryByTemplateIDPaginated 根据模板ID获取历史记录（分页）
+func (r *TemplateHistoryRepository) GetHistoryByTemplateIDPaginated(templateID uint, page, size int) ([]types.TemplateHistoryResponse, int64, error) {
 	var histories []model.TemplateHistory
-	if err := r.db.Where("template_id = ?", templateID).Order("created_at DESC").Find(&histories).Error; err != nil {
-		return nil, err
+	var count int64
+
+	// 查询总数
+	if err := r.db.Model(&model.TemplateHistory{}).Where("template_id = ?", templateID).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * size
+	if err := r.db.Where("template_id = ?", templateID).Order("created_at DESC").Offset(offset).Limit(size).Find(&histories).Error; err != nil {
+		return nil, 0, err
 	}
 
 	// 转换为响应类型
@@ -41,5 +49,5 @@ func (r *TemplateHistoryRepository) GetHistoryByTemplateID(templateID uint) ([]t
 		}
 	}
 
-	return responses, nil
+	return responses, count, nil
 }

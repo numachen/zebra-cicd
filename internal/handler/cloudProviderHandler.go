@@ -45,7 +45,7 @@ func (r *CloudProviderRepository) ListWithConditions(conditions types.CloudProvi
 	offset := (page - 1) * size
 
 	// 构建查询条件
-	db := r.db.Model(&model.CloudProvider{}).Where("is_deleted = ?", false)
+	db := r.db.Model(&model.CloudProvider{})
 
 	if conditions.Name != "" {
 		db = db.Where("name LIKE ?", "%"+conditions.Name+"%")
@@ -77,7 +77,7 @@ func (r *CloudProviderRepository) Update(provider *model.CloudProvider) error {
 	return r.db.Save(provider).Error
 }
 
-// Delete 删除云厂商（软删除）
+// Delete 删除云厂商
 func (r *CloudProviderRepository) Delete(id uint) error {
-	return r.db.Model(&model.CloudProvider{}).Where("id = ?", id).Update("is_deleted", true).Error
+	return r.db.Model(&model.CloudProvider{}).Where("id = ?", id).Delete(&model.CloudProvider{}).Error
 }

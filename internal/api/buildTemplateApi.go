@@ -22,7 +22,7 @@ import (
 // @Success 201 {object} model.BuildTemplate
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates [post]
+// @Router /api/templates/build [post]
 func CreateBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	var req model.BuildTemplate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -45,7 +45,7 @@ func CreateBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateServic
 // @Success 200 {object} model.BuildTemplate
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{id} [get]
+// @Router /api/templates/build/{id} [get]
 func GetBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -63,19 +63,48 @@ func GetBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) 
 
 // ListBuildTemplatesHandler 获取构建模板列表处理函数
 // @Summary 获取构建模板列表
-// @Description 获取所有构建模板的列表
+// @Description 获取所有构建模板的列表，支持按名称、语言、创建者过滤，支持分页
 // @Tags buildTemplates
 // @Produce json
-// @Success 200 {array} model.BuildTemplate
+// @Param name query string false "模板名称"
+// @Param language query string false "编程语言"
+// @Param creator query string false "创建者"
+// @Param updater query string false "修改人"
+// @Param page query int false "页码" default(1)
+// @Param size query int false "每页数量" default(10)
+// @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.BuildTemplate}}
 // @Failure 500 {object} map[string]string
-// @Router /api/templates [get]
+// @Router /api/templates/build [get]
 func ListBuildTemplatesHandler(c *gin.Context, svc *service.BuildTemplateService) {
-	templates, err := svc.ListTemplates()
+	// 获取查询参数
+	name := c.Query("name")
+	language := c.Query("language")
+	creator := c.Query("creator")
+	updater := c.Query("updater")
+
+	// 获取分页参数
+	page := 1
+	size := 10
+	if pageStr := c.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if sizeStr := c.Query("size"); sizeStr != "" {
+		if s, err := strconv.Atoi(sizeStr); err == nil && s > 0 {
+			size = s
+		}
+	}
+
+	// 调用服务层获取数据
+	templates, total, err := svc.ListTemplates(name, language, creator, updater, page, size)
 	if err != nil {
 		types.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	types.Success(c, templates)
+
+	// 返回分页结果
+	types.PageSuccess(c, total, templates)
 }
 
 // UpdateBuildTemplateHandler 更新构建模板处理函数
@@ -90,7 +119,7 @@ func ListBuildTemplatesHandler(c *gin.Context, svc *service.BuildTemplateService
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{id} [put]
+// @Router /api/templates/build/{id} [put]
 func UpdateBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -151,7 +180,7 @@ func UpdateBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateServic
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{id} [delete]
+// @Router /api/templates/build/{id} [delete]
 func DeleteBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -169,15 +198,17 @@ func DeleteBuildTemplateHandler(c *gin.Context, svc *service.BuildTemplateServic
 
 // GetTemplateHistoryHandler 获取模板修改历史
 // @Summary 获取模板修改历史
-// @Description 根据模板ID获取模板的修改历史记录
+// @Description 根据模板ID获取模板的修改历史记录，支持分页
 // @Tags buildTemplates
 // @Produce json
 // @Param id path int true "模板ID"
-// @Success 200 {array} model.TemplateHistory
+// @Param page query int false "页码" default(1)
+// @Param size query int false "每页数量" default(10)
+// @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.TemplateHistory}}
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{id}/history [get]
+// @Router /api/templates/build/{id}/history [get]
 func GetTemplateHistoryHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -186,12 +217,29 @@ func GetTemplateHistoryHandler(c *gin.Context, svc *service.BuildTemplateService
 		return
 	}
 
-	history, err := svc.GetTemplateHistory(uint(id))
+	// 解析分页参数
+	page := 1
+	size := 10
+	if pageStr := c.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if sizeStr := c.Query("size"); sizeStr != "" {
+		if s, err := strconv.Atoi(sizeStr); err == nil && s > 0 {
+			size = s
+		}
+	}
+
+	// 调用服务层获取分页数据
+	history, total, err := svc.GetTemplateHistoryPaginated(uint(id), page, size)
 	if err != nil {
 		types.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	types.Success(c, history)
+
+	// 返回分页结果
+	types.PageSuccess(c, total, history)
 }
 
 // AssociateRepoWithTemplateHandler 关联仓库和模板
@@ -204,7 +252,7 @@ func GetTemplateHistoryHandler(c *gin.Context, svc *service.BuildTemplateService
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{templateId}/repos/{repoId} [post]
+// @Router /api/templates/build/{templateId}/repos/{repoId} [post]
 func AssociateRepoWithTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	templateIDStr := c.Param("templateId")
 	repoIDStr := c.Param("repoId")
@@ -240,7 +288,7 @@ func AssociateRepoWithTemplateHandler(c *gin.Context, svc *service.BuildTemplate
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/templates/{templateId}/repos/{repoId} [delete]
+// @Router /api/templates/build/{templateId}/repos/{repoId} [delete]
 func DisassociateRepoWithTemplateHandler(c *gin.Context, svc *service.BuildTemplateService) {
 	templateIDStr := c.Param("templateId")
 	repoIDStr := c.Param("repoId")
@@ -267,7 +315,7 @@ func DisassociateRepoWithTemplateHandler(c *gin.Context, svc *service.BuildTempl
 
 // RegisterTemplateRoutes 注册模板相关路由
 func RegisterTemplateRoutes(r *gin.Engine, svc *service.BuildTemplateService) {
-	g := r.Group("/api/templates")
+	g := r.Group("/api/templates/build")
 	{
 		// 创建模板
 		g.POST("", func(c *gin.Context) {

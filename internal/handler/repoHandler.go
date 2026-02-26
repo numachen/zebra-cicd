@@ -51,8 +51,8 @@ func (r *RepoRepository) GetByEName(eName string) (*model.Repo, error) {
 }
 
 // ListWithConditions 根据条件分页获取仓库列表
-func (r *RepoRepository) ListWithConditions(conditions types.RepoQueryConditions, page, size int) ([]model.Repo, int64, error) {
-	var repos []model.Repo
+func (r *RepoRepository) ListWithConditions(conditions types.RepoQueryConditions, page, size int) ([]model.RepoResp, int64, error) {
+	var repos []model.RepoResp
 	var total int64
 
 	offset := (page - 1) * size
@@ -85,10 +85,14 @@ func (r *RepoRepository) ListWithConditions(conditions types.RepoQueryConditions
 		return nil, 0, err
 	}
 
-	// 获取分页数据，并预加载关联模板
-	if err := db.Offset(offset).Limit(size).Preload("Templates").Preload("DeploymentTemplates").Order("id DESC").Find(&repos).Error; err != nil {
+	// 获取分页数据
+	if err := db.Offset(offset).Limit(size).Order("id DESC").Find(&repos).Error; err != nil {
 		return nil, 0, err
 	}
+	// 获取分页数据，并预加载关联模板
+	//if err := db.Offset(offset).Limit(size).Preload("Templates").Preload("DeploymentTemplates").Order("id DESC").Find(&repos).Error; err != nil {
+	//	return nil, 0, err
+	//}
 
 	return repos, total, nil
 }

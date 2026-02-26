@@ -40,9 +40,14 @@ func (s *BuildTemplateService) GetTemplate(id uint) (*model.BuildTemplate, error
 	return s.templateRepo.GetByID(id)
 }
 
-// ListTemplates 获取模板列表
-func (s *BuildTemplateService) ListTemplates() ([]model.BuildTemplate, error) {
-	return s.templateRepo.List()
+// ListTemplates 获取模板列表，支持过滤和分页
+func (s *BuildTemplateService) ListTemplates(name, language, creator, updater string, page, size int) ([]model.BuildTemplateResponse, int64, error) {
+	return s.templateRepo.List(name, language, creator, updater, page, size)
+}
+
+// GetTemplateHistoryPaginated 获取模板修改历史（分页）
+func (s *BuildTemplateService) GetTemplateHistoryPaginated(templateID uint, page, size int) ([]types.TemplateHistoryResponse, int64, error) {
+	return s.historyRepo.GetHistoryByTemplateIDPaginated(templateID, page, size)
 }
 
 // UpdateTemplate 更新模板并保存历史记录
@@ -87,9 +92,4 @@ func (s *BuildTemplateService) RemoveRepoFromTemplate(templateID, repoID uint) e
 // GetTemplatesByRepoID 根据仓库ID获取模板
 func (s *BuildTemplateService) GetTemplatesByRepoID(repoID uint) ([]model.BuildTemplate, error) {
 	return s.templateRepo.GetTemplatesByRepoID(repoID)
-}
-
-// GetTemplateHistory 获取模板修改历史
-func (s *BuildTemplateService) GetTemplateHistory(templateID uint) ([]types.TemplateHistoryResponse, error) {
-	return s.historyRepo.GetHistoryByTemplateID(templateID)
 }

@@ -46,10 +46,6 @@ func (s *RepoService) DeleteRepo(id uint) error {
 	return s.repoRepo.Delete(id)
 }
 
-func (s *RepoService) GetRepoByEName(eName string) (*model.Repo, error) {
-	return s.repoRepo.GetByEName(eName)
-}
-
 // GetRepoInfoFromGitLab 根据id从GitLab获取仓库地址
 func (s *RepoService) GetRepoInfoFromGitLab(id string) (*types.Project, error) {
 	// 在 service 层调用时
@@ -62,6 +58,6 @@ func (s *RepoService) GetRepoInfoFromGitLab(id string) (*types.Project, error) {
 }
 
 // ListReposWithConditions 根据条件分页获取仓库列表
-func (s *RepoService) ListReposWithConditions(conditions types.RepoQueryConditions, page, size int) ([]model.Repo, int64, error) {
+func (s *RepoService) ListReposWithConditions(conditions types.RepoQueryConditions, page, size int) ([]model.RepoResp, int64, error) {
 	return s.repoRepo.ListWithConditions(conditions, page, size)
 }

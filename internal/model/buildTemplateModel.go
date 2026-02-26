@@ -4,6 +4,18 @@ import (
 	"github.com/numachen/zebra-cicd/pkg/timeutil"
 )
 
+type BuildTemplateResponse struct {
+	ID         uint              `json:"id"`
+	Name       string            `json:"name"`
+	Language   string            `json:"language"`
+	Creator    string            `json:"creator"`
+	Updater    string            `json:"updater"`
+	Dockerfile string            `json:"dockerfile"`
+	Pipeline   string            `json:"pipeline"`
+	CreatedAt  timeutil.JSONTime `json:"created_at"`
+	UpdatedAt  timeutil.JSONTime `json:"updated_at"`
+}
+
 type BuildTemplate struct {
 	ID         uint              `gorm:"primaryKey" json:"id"`
 	Name       string            `gorm:"size:255;uniqueIndex;not null;comment:名称" json:"name"`
@@ -27,6 +39,6 @@ type TemplateHistory struct {
 	Pipeline   string            `gorm:"type:text;comment:Pipeline" json:"pipeline"`
 	CreatedAt  timeutil.JSONTime `gorm:"comment:创建时间" json:"created_at"`
 
-	// 关联模板
-	Template BuildTemplate `json:"template"`
+	// 指定关联字段
+	Template BuildTemplate `gorm:"foreignKey:TemplateID;references:ID" json:"template"`
 }

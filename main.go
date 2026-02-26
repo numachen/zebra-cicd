@@ -25,17 +25,6 @@ import (
 // @host localhost:9527
 // @BasePath /
 func main() {
-	// 初始化 Zipkin tracer（返回 tracer 与 closer）
-	tracer, closer, err := middleware.InitZipkin("http://192.168.41.54:9411/api/v2/spans", "zebra-cicd", "192.168.30.85:9527")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to init zipkin: %v\n", err)
-		os.Exit(1)
-	}
-	defer func() {
-		if closer != nil {
-			_ = closer.Close()
-		}
-	}()
 
 	defer log.Sync()
 
@@ -104,8 +93,6 @@ func main() {
 
 	// Setup Gin router
 	r := gin.New()
-	// 使用 Zipkin 中间件（传入 tracer）
-	r.Use(middleware.ZipkinMiddleware(tracer))
 	r.Use(gin.Recovery())
 	r.Use(cors.Default())                    // 添加CORS支持
 	r.Use(middleware.RequestLogger(log.L())) // 添加请求日志中间件

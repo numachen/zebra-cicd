@@ -10,7 +10,6 @@ type ImageRepository struct {
 	Username    string            `gorm:"size:100;comment:用户名" json:"username"`
 	Password    string            `gorm:"type:text;comment:密码" json:"password"`
 	Description string            `gorm:"type:text;comment:描述" json:"description"`
-	IsDeleted   bool              `gorm:"default:false;comment:是否删除" json:"-"`
 	CreatedAt   timeutil.JSONTime `gorm:"comment:创建时间" json:"created_at"`
 	UpdatedAt   timeutil.JSONTime `gorm:"comment:更新时间" json:"updated_at"`
 }

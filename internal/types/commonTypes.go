@@ -23,7 +23,7 @@ type PageResponse struct {
 // Success 成功响应
 func Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Response{
-		Code:    0,
+		Code:    200,
 		Message: "success",
 		Data:    data,
 	})
@@ -32,7 +32,7 @@ func Success(c *gin.Context, data interface{}) {
 // PageSuccess 分页成功响应
 func PageSuccess(c *gin.Context, total int64, records interface{}) {
 	c.JSON(http.StatusOK, Response{
-		Code:    0,
+		Code:    200,
 		Message: "success",
 		Data: PageResponse{
 			Total:   total,
@@ -106,4 +106,12 @@ type DeploymentTemplateQueryConditions struct {
 	TemplateType string `json:"template_type"`
 	Status       string `json:"status"`
 	Creator      string `json:"creator"`
+}
+
+// ImageRepositoryQueryConditions 镜像仓库查询条件
+type ImageRepositoryQueryConditions struct {
+	Name string `json:"name"` // 仓库名称过滤
+	URL  string `json:"url"`  // 仓库地址过滤
+	Page int    `json:"page"` // 页码
+	Size int    `json:"size"` // 每页数量
 }

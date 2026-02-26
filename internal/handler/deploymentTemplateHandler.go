@@ -5,8 +5,6 @@ import (
 
 	"github.com/numachen/zebra-cicd/internal/model"
 	"github.com/numachen/zebra-cicd/internal/types"
-	"github.com/numachen/zebra-cicd/pkg/middleware"
-	"github.com/openzipkin/zipkin-go"
 	"gorm.io/gorm"
 )
 
@@ -24,26 +22,9 @@ func (r *DeploymentTemplateRepository) Create(template *model.DeploymentTemplate
 }
 
 // GetByID 修改函数签名，增加 ctx 参数（保留原 ctx）
-// 从上下文创建子 span，记录 SQL 查询相关信息
 func (r *DeploymentTemplateRepository) GetByID(ctx context.Context, id uint) (*model.DeploymentTemplate, error) {
-	// 使用 middleware 提供的 StartChildSpan 创建子 span
-	ctx, child := middleware.StartChildSpan(ctx, "mysql.query")
-	if child != nil {
-		defer child.Finish()
-		child.Tag("db.statement", "SELECT * FROM deployment_templates WHERE id = ?")
-		child.Tag("db.type", "sql")
-	}
-
 	var template model.DeploymentTemplate
 	if err := r.db.WithContext(ctx).First(&template, id).Error; err != nil {
-		// 如果有子 span 则打 error tag，否则尝试在 parent span 上打 tag
-		if child != nil {
-			child.Tag("error", err.Error())
-		} else {
-			if sp := zipkin.SpanFromContext(ctx); sp != nil {
-				sp.Tag("error", err.Error())
-			}
-		}
 		return nil, err
 	}
 	return &template, nil
@@ -57,7 +38,7 @@ func (r *DeploymentTemplateRepository) ListWithConditions(conditions types.Deplo
 	offset := (page - 1) * size
 
 	// 构建查询条件
-	db := r.db.Model(&model.DeploymentTemplate{}).Where("is_deleted = ?", false)
+	db := r.db.Model(&model.DeploymentTemplate{})
 
 	if conditions.Name != "" {
 		db = db.Where("name LIKE ?", "%"+conditions.Name+"%")
@@ -81,7 +62,7 @@ func (r *DeploymentTemplateRepository) ListWithConditions(conditions types.Deplo
 	}
 
 	// 获取分页数据
-	if err := db.Offset(offset).Limit(size).Order("id DESC").Preload("Repos").Find(&templates).Error; err != nil {
+	if err := db.Offset(offset).Limit(size).Order("id DESC").Find(&templates).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -93,9 +74,20 @@ func (r *DeploymentTemplateRepository) Update(template *model.DeploymentTemplate
 	return r.db.Save(template).Error
 }
 
-// Delete 删除部署模板（软删除）
+// Delete 删除部署模板，并删除关联的历史修改记录
 func (r *DeploymentTemplateRepository) Delete(id uint) error {
-	return r.db.Model(&model.DeploymentTemplate{}).Where("id = ?", id).Update("is_deleted", true).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// 1. 删除关联的历史修改记录
+		if err := tx.Where("deployment_template_id = ?", id).Delete(&model.DeploymentTemplateHistory{}).Error; err != nil {
+			return err
+		}
+		// 2. 删除部署模板（硬删除）
+		if err := tx.Where("id = ?", id).Delete(&model.DeploymentTemplate{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // AddRepoToTemplate 添加仓库到部署模板关联

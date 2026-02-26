@@ -13,14 +13,14 @@ import (
 // GetServerHandler 根据ID获取服务器
 // @Summary 根据ID获取服务器
 // @Description 根据服务器ID获取服务器详情
-// @Tags servers
+// @Tags linux-machines
 // @Produce json
 // @Param id path int true "服务器ID"
 // @Success 200 {object} model.Server
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers/{id} [get]
+// @Router /api/linux-machines/{id} [get]
 func GetServerHandler(c *gin.Context, svc *service.ServerService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -40,7 +40,7 @@ func GetServerHandler(c *gin.Context, svc *service.ServerService) {
 // ListServersHandler 获取服务器列表
 // @Summary 获取服务器列表
 // @Description 获取所有服务器的列表，支持按名称、主机等条件查询
-// @Tags servers
+// @Tags linux-machines
 // @Produce json
 // @Param name query string false "服务器名称"
 // @Param host query string false "服务器主机地址"
@@ -49,7 +49,7 @@ func GetServerHandler(c *gin.Context, svc *service.ServerService) {
 // @Param size query int false "页数" default(10)
 // @Success 200 {object} types.Response{data=types.PageResponse{records=[]model.Server}}
 // @Failure 500 {object} map[string]string
-// @Router /api/servers [get]
+// @Router /api/linux-machines [get]
 func ListServersHandler(c *gin.Context, svc *service.ServerService) {
 	// 解析查询参数
 	name := c.Query("name")
@@ -100,14 +100,14 @@ func ListServersHandler(c *gin.Context, svc *service.ServerService) {
 // CreateServerHandler 创建服务器
 // @Summary 创建服务器
 // @Description 创建一个新的服务器连接信息
-// @Tags servers
+// @Tags linux-machines
 // @Accept json
 // @Produce json
 // @Param server body model.Server true "服务器信息"
 // @Success 201 {object} model.Server
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers [post]
+// @Router /api/linux-machines [post]
 func CreateServerHandler(c *gin.Context, svc *service.ServerService) {
 	var req model.Server
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -124,7 +124,7 @@ func CreateServerHandler(c *gin.Context, svc *service.ServerService) {
 // UpdateServerHandler 更新服务器
 // @Summary 更新服务器
 // @Description 根据服务器ID更新服务器信息
-// @Tags servers
+// @Tags linux-machines
 // @Accept json
 // @Produce json
 // @Param id path int true "服务器ID"
@@ -133,7 +133,7 @@ func CreateServerHandler(c *gin.Context, svc *service.ServerService) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers/{id} [put]
+// @Router /api/linux-machines/{id} [put]
 func UpdateServerHandler(c *gin.Context, svc *service.ServerService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -192,14 +192,14 @@ func UpdateServerHandler(c *gin.Context, svc *service.ServerService) {
 // DeleteServerHandler 删除服务器
 // @Summary 删除服务器
 // @Description 根据服务器ID删除服务器
-// @Tags servers
+// @Tags linux-machines
 // @Produce json
 // @Param id path int true "服务器ID"
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers/{id} [delete]
+// @Router /api/linux-machines/{id} [delete]
 func DeleteServerHandler(c *gin.Context, svc *service.ServerService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -218,13 +218,13 @@ func DeleteServerHandler(c *gin.Context, svc *service.ServerService) {
 // ConnectServerHandler 连接服务器
 // @Summary 连接服务器
 // @Description 测试连接到服务器
-// @Tags servers
+// @Tags linux-machines
 // @Produce json
 // @Param id path int true "服务器ID"
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers/{id}/connect [post]
+// @Router /api/linux-machines/{id}/connect [post]
 func ConnectServerHandler(c *gin.Context, svc *service.ServerService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -243,13 +243,13 @@ func ConnectServerHandler(c *gin.Context, svc *service.ServerService) {
 // ListContainersHandler 获取Docker容器列表
 // @Summary 获取Docker容器列表
 // @Description 获取服务器上的Docker容器列表
-// @Tags servers
+// @Tags linux-machines
 // @Produce json
 // @Param id path int true "服务器ID"
 // @Success 200 {array} model.DockerContainer
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/servers/{id}/containers [get]
+// @Router /api/linux-machines/{id}/containers [get]
 func ListContainersHandler(c *gin.Context, svc *service.ServerService) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -268,7 +268,7 @@ func ListContainersHandler(c *gin.Context, svc *service.ServerService) {
 
 // RegisterServerRoutes 注册服务器相关路由
 func RegisterServerRoutes(r *gin.Engine, svc *service.ServerService) {
-	g := r.Group("/api/servers")
+	g := r.Group("/api/linux-machines")
 	{
 		// 创建服务器
 		g.POST("", func(c *gin.Context) {
