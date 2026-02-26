@@ -31,10 +31,9 @@ func main() {
 	// Load config (env or config file)
 	cfg := config.Load()
 
-	// init logger with custom config
+	// 初始化日志系统
 	if err := log.InitWithConfig(cfg.Logging); err != nil {
-		// fallback to stdout if logger fails to init
-		fmt.Fprintf(os.Stderr, "failed to init logger: %v\n", err)
+		log.S().Error("Failed to init logger")
 		os.Exit(1)
 	}
 
